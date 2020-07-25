@@ -66,6 +66,7 @@ public class AppMain {
         printDebugMessage("Starting to process file.");
 
 
+
     }
 
     private static void validateInputFile(File file){
