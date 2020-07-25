@@ -18,7 +18,7 @@ public class AppMain {
 
     private static String fileRequestString = "Please provide an XML file path:";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         File inputFile = null;
 
@@ -35,10 +35,7 @@ public class AppMain {
                     }
                 }else{
                     // if here, then we aren't dealing with an option and can see if its a file
-
                     inputFile = new File(arg);
-                    // add validation to check file exists
-                    // validate file exists
                 }
             }
         }
@@ -65,20 +62,25 @@ public class AppMain {
     }
 
     private static void processFile(File file){
-        //TODO: process file
+
+
+
     }
 
     private static void validateInputFile(File file){
-        //TODO: validate input file exists and can be read in
 
+        printDebugMessage("Validating input file exists.");
+
+        //TODO: validate input file exists and can be read in
+        Validate.notNull(file, "File was not provided. Please provide an XML file to be processed.");
+        Validate.isTrue(file.exists(), "Could not find file with file path {}", file.getAbsolutePath());
 
         //TODO: validate file is an XML
 
-
-        //TODO: validate headings exist as per spec
+        printDebugMessage("File " + file.getName()+ " existence validation completed.");
     }
 
-    private static void callOption(String option){
+    private static void callOption(String option) throws IOException {
 
         //TODO: probably a cleaner way of doing this but this is fast
         if(option.equals(debug)){
@@ -88,7 +90,14 @@ public class AppMain {
             // use logger
             printHelp();
         }else{
-            //TODO: throw error to user
+            //shouldn't get here
+            throw new IOException();
+        }
+    }
+
+    private static void printDebugMessage(String message){
+        if(debugMode){
+            System.out.println(message);
         }
     }
 
