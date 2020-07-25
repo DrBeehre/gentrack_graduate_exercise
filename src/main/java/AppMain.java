@@ -2,15 +2,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang3.Validate;
 
 public class AppMain {
 
     private static String help = "-h";
     private static String debug = "-d";
 
-    private static ArrayList<String> options = (ArrayList<String>) Arrays.asList("-d", "-h");
+    private static List<String> options = Arrays.asList("-d", "-h");
 
     private static boolean debugMode = false;
 
@@ -69,7 +71,11 @@ public class AppMain {
     private static void validateInputFile(File file){
         //TODO: validate input file exists and can be read in
 
+
         //TODO: validate file is an XML
+
+
+        //TODO: validate headings exist as per spec
     }
 
     private static void callOption(String option){
