@@ -26,7 +26,7 @@ public class AppMain {
         if(args.length > 0){
             for (String arg: args) {
                 // for each arg, check if its an option or file path
-                if(arg.substring(1).equals("-")){
+                if(arg.startsWith("-")){
                     // if here, then we are dealing with a potential option
                     if(options.contains(arg)){
                         callOption(arg);
@@ -63,6 +63,7 @@ public class AppMain {
 
     private static void processFile(File file){
 
+        printDebugMessage("Starting to process file.");
 
 
     }
