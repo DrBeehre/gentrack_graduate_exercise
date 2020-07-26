@@ -199,20 +199,22 @@ public class AppMain {
                     if(currentBlockName != null){
                         Validate.isTrue(hasHeader, "No header for block.");
 
-                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString() + "\\n"+ blockBuilder.toString()));
+                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString()
+                                + System.lineSeparator() + blockBuilder.toString()));
                     }
 
                     // set the current block name and reset block builder
                     currentBlockName = strings[1];
                     blockBuilder = new StringBuilder();
-                    blockBuilder.append(s).append("\\n");
+                    blockBuilder.append(s).append(System.lineSeparator());
                     continue;
                 }
 
                 if(leadingStr.equals("900")){
                     hastrailer = true;
                     if(currentBlockName != null && blockBuilder != null){
-                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString() + blockBuilder.toString()));
+                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString()
+                                + System.lineSeparator() +  blockBuilder.toString()));
                     }
                     continue;
                 }
@@ -225,7 +227,7 @@ public class AppMain {
                 Validate.isTrue(currentBlockName != null, "Current block name is null.");
                 Validate.isTrue(blockBuilder != null, "Current block is null.");
 
-                blockBuilder.append(s).append("\\n");
+                blockBuilder.append(s).append(System.lineSeparator());
             }
         }
 
