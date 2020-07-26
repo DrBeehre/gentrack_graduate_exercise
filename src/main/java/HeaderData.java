@@ -1,3 +1,7 @@
+import javax.xml.bind.annotation.*;
+
+@XmlRootElement(name = "Header")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class HeaderData {
 
     private String From;
@@ -11,12 +15,12 @@ public class HeaderData {
     public HeaderData() {}
 
     public HeaderData(String from,
-                                 String to,
-                                 String messageID,
-                                 String messageDate,
-                                 String transactionGroup,
-                                 String priority,
-                                 String market) {
+                     String to,
+                     String messageID,
+                     String messageDate,
+                     String transactionGroup,
+                     String priority,
+                     String market) {
         From = from;
         To = to;
         MessageID = messageID;
