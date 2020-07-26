@@ -46,7 +46,6 @@ public class XmlToCSVProcessor {
         } catch (Exception e) {
             printDebugMessage(e.getMessage());
         }
-
     }
 
     private void sendCSVs(List<Pair<String, String>> csvStringPairs, String outputPath) throws IOException {
@@ -93,13 +92,17 @@ public class XmlToCSVProcessor {
             // Split CSVIntervalData by commons, spaces, tabs and new lines
             String[] subStrings = transaction.getMeterDataNotification().getCSVIntervalData().split("\\n");
 
-            StringBuilder headerRow = new StringBuilder();
-
             Boolean hasHeader = false;
             Boolean hastrailer = false;
 
             String currentBlockName = null;
             StringBuilder blockBuilder = null;
+
+            StringBuilder headerRow = getHeader(subStrings);
+            StringBuilder tailerRow = getTailer(subStrings);
+
+            Validate.notNull(headerRow.length() != 0, "No header row '100' provided in csv data.");
+            Validate.notNull(tailerRow.length() != 0, "No tailing '900' provided in csv data.");
 
             for (String s : subStrings) {
 
@@ -109,11 +112,8 @@ public class XmlToCSVProcessor {
                 String[] strings = s.split(",");
                 String leadingStr = strings[0];
 
-                // If 100, then this is the header row
-                if (leadingStr.equals("100")) {
-                    headerRow.append(s);
-                    hasHeader = true;
-                    hastrailer = false;
+                // If 100, then this is the header row or is empty
+                if (leadingStr.equals("100") || leadingStr.equals("")) {
                     continue;
                 }
 
@@ -122,10 +122,9 @@ public class XmlToCSVProcessor {
 
                     // If this is true, then we know we already have a block that needs to be written to a file
                     if (currentBlockName != null) {
-                        Validate.isTrue(hasHeader, "No header for block.");
-
-                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString()
-                                + System.lineSeparator() + blockBuilder.toString()));
+                        csvNameAndStringValuePair.add(new Pair<>(currentBlockName, headerRow.toString()
+                                + System.lineSeparator() + blockBuilder.toString()
+                                + tailerRow.toString()));
                     }
 
                     // set the current block name and reset block builder
@@ -136,30 +135,58 @@ public class XmlToCSVProcessor {
                 }
 
                 if (leadingStr.equals("900")) {
-                    hastrailer = true;
-                    if (currentBlockName != null && blockBuilder != null) {
-                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString()
-                                + System.lineSeparator() + blockBuilder.toString()));
+                    if (currentBlockName != null) {
+                        csvNameAndStringValuePair.add(new Pair<>(currentBlockName, headerRow.toString()
+                                + System.lineSeparator() + blockBuilder.toString()
+                                + tailerRow.toString()));
                     }
                     continue;
                 }
 
                 // if we are here, non of the above conditions were meet
                 // and assuming we have set our headers, we can start adding to the current block
-                if (!hasHeader) {
-                    continue;
-                }
                 Validate.isTrue(currentBlockName != null, "Current block name is null.");
                 Validate.isTrue(blockBuilder != null, "Current block is null.");
 
                 blockBuilder.append(s).append(System.lineSeparator());
             }
-
-            Validate.notNull(hastrailer, "No tailing '900' provided in csv data.");
         }
 
-
         return csvNameAndStringValuePair;
+    }
+
+    private StringBuilder getHeader(String[] subStrings){
+        for (String s : subStrings) {
+
+            s.trim();
+
+            // Split by comma, and get the first element. This will tell us what to do with the row
+            String[] strings = s.split(",");
+            String leadingStr = strings[0];
+
+            if(leadingStr.equals("100")){
+                return new StringBuilder().append(s);
+            }
+        }
+
+        return null;
+    }
+
+    private StringBuilder getTailer(String[] subStrings){
+        for (String s : subStrings) {
+
+            s.trim();
+
+            // Split by comma, and get the first element. This will tell us what to do with the row
+            String[] strings = s.split(",");
+            String leadingStr = strings[0];
+
+            if (leadingStr.equals("900")) {
+                return new StringBuilder().append(s);
+            }
+        }
+
+        return null;
     }
 
     private List<Transaction> getTransactionData(NodeList nodeList, Document doc) throws Exception {

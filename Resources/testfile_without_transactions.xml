@@ -1,0 +1,11 @@
+<ase:aseXML xmlns:ase="urn:aseXML:r32" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:aseXML:r32 http://www.nemmco.com.au/aseXML/schemas/r32/aseXML_r32.xsd">
+	<Header>
+		<From>ACTEWMP</From>
+		<To>ACTEWNGY</To>
+		<MessageID>HGL_161007_133124</MessageID>
+		<MessageDate>2018-01-20T10:10:22+10:00</MessageDate>
+		<TransactionGroup>MTRD</TransactionGroup>
+		<Priority>Low</Priority>
+		<Market>NEM</Market>
+	</Header>
+</ase:aseXML>
