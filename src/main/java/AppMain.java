@@ -38,7 +38,11 @@ public class AppMain {
                 if (args[i].startsWith("-")) {
                     // if here, then we are dealing with a potential option
                     if (options.contains(args[i])) {
-                        callOption(args[i], args[i + 1]);
+                        if(i + 1 != args.length) {
+                            callOption(args[i], args[i + 1]);
+                        }else{
+                            callOption(args[i], "");
+                        }
                     } else {
                         callOption(help, "");
                     }
