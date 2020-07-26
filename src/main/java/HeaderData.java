@@ -1,7 +1,3 @@
-import javax.xml.bind.annotation.*;
-
-@XmlRootElement(name = "Header")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class HeaderData {
 
     private String From;
@@ -59,6 +55,34 @@ public class HeaderData {
 
     public String getMarket() {
         return Market;
+    }
+
+    public void setFrom(String from) {
+        From = from;
+    }
+
+    public void setTo(String to) {
+        To = to;
+    }
+
+    public void setMessageID(String messageID) {
+        MessageID = messageID;
+    }
+
+    public void setMessageDate(String messageDate) {
+        MessageDate = messageDate;
+    }
+
+    public void setTransactionGroup(String transactionGroup) {
+        TransactionGroup = transactionGroup;
+    }
+
+    public void setPriority(String priority) {
+        Priority = priority;
+    }
+
+    public void setMarket(String market) {
+        Market = market;
     }
 }
 

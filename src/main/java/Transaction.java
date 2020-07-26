@@ -1,8 +1,3 @@
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement(name = "Transaction")
 public class Transaction {
 
     private String transactionID;
@@ -18,18 +13,27 @@ public class Transaction {
         this.meterDataNotification = meterDataNotification;
     }
 
-    @XmlAttribute(name = "transactionID")
     public String getTransactionID() {
         return transactionID;
     }
 
-    @XmlAttribute(name = "transactionDate")
     public String getTransactionDate() {
         return transactionDate;
     }
 
-    @XmlElement(name = "MeterDataNotification")
     public MeterDataNotification getMeterDataNotification() {
         return meterDataNotification;
+    }
+
+    public void setTransactionID(String transactionID) {
+        this.transactionID = transactionID;
+    }
+
+    public void setTransactionDate(String transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public void setMeterDataNotification(MeterDataNotification meterDataNotification) {
+        this.meterDataNotification = meterDataNotification;
     }
 }
