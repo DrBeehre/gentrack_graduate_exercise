@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javafx.util.Pair;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.Validate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -71,7 +73,7 @@ public class AppMain {
         printInfoMessage("Starting to process file.");
 
         try {
-            printInfoMessage("Start unmarshalling.");
+            printInfoMessage("Start parsing XML.");
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -87,9 +89,11 @@ public class AppMain {
 
             Validate.notEmpty(transactions, "No transactions found.");
 
-            List<File> csvOutputs = generateCSVFiles(transactions);
+            List<Pair<String, String>> csvOutputs = generateCSVFiles(transactions);
 
-            printInfoMessage("Unmarshalling complete.");
+
+
+            printInfoMessage("Parsing complete.");
 
         }catch (Exception e){
             printDebugMessage(e.getMessage());
@@ -97,9 +101,80 @@ public class AppMain {
 
     }
 
-    private static List<File> generateCSVFiles(List<Transaction> transactions){
-        //TODO: complete generateCSVFiles method
-        return null;
+    private static List<Pair<String, String>> generateCSVFiles(List<Transaction> transactions){
+
+        // This is an interesting way of doing this, but means I can send back a list of pairs with the
+        // name as the key, and string to be sent as a CSV as the value.
+        // Then I can test this method without creating a file.
+        List<Pair<String, String>> csvNameAndStringValuePair = new ArrayList<Pair<String, String>>();
+
+        for (Transaction transaction : transactions) {
+
+            // Split CSVIntervalData by commons, spaces, tabs and new lines
+            String[] subStrings = transaction.getMeterDataNotification().getCSVIntervalData().split("\\n");
+
+            StringBuilder headerRow = new StringBuilder();
+
+            Boolean hasHeader = false;
+            Boolean hastrailer = false;
+
+            String currentBlockName = null;
+            StringBuilder blockBuilder = null;
+
+            for(String s : subStrings){
+
+                s.trim();
+
+                // Split by comma, and get the first element. This will tell us what to do with the row
+                String[] strings = s.split(",");
+                String leadingStr = strings[0];
+
+                // If 100, then this is the header row
+                if(leadingStr.equals("100")) {
+                    headerRow.append(s);
+                    hasHeader = true;
+                    hastrailer = false;
+                    continue;
+                }
+
+                // If 200, then we know we are dealing with a new block
+                if(leadingStr.equals("200")){
+
+                    // If this is true, then we know we already have a block that needs to be written to a file
+                    if(currentBlockName != null){
+                        Validate.isTrue(hasHeader, "No header for block.");
+
+                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString() + blockBuilder.toString()));
+                    }
+
+                    // set the current block name and reset block builder
+                    currentBlockName = strings[1];
+                    blockBuilder = new StringBuilder();
+                    blockBuilder.append(s).append("\\n");
+                    continue;
+                }
+
+                if(leadingStr.equals("900")){
+                    hastrailer = true;
+                    if(currentBlockName != null && blockBuilder != null){
+                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString() + blockBuilder.toString()));
+                    }
+                    continue;
+                }
+
+                // if we are here, non of the above conditions were meet
+                // and assuming we have set our headers, we can start adding to the current block
+                if(!hasHeader){
+                    continue;
+                }
+                Validate.isTrue(currentBlockName != null, "Current block name is null.");
+                Validate.isTrue(blockBuilder != null, "Current block is null.");
+
+                blockBuilder.append(s).append("\\n");
+            }
+        }
+
+        return csvNameAndStringValuePair;
     }
 
     private static List<Transaction> getTransactionData(NodeList nodeList, Document doc) throws Exception {
