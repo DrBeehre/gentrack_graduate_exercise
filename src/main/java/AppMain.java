@@ -1,9 +1,11 @@
 import java.io.*;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javafx.util.Pair;
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.Validate;
 import org.w3c.dom.Document;
@@ -18,31 +20,32 @@ public class AppMain {
 
     private static String help = "-h";
     private static String debug = "-d";
+    private static String input = "-i";
+    private static String output = "-o";
 
-    private static List<String> options = Arrays.asList("-d", "-h");
+    private static List<String> options = Arrays.asList(help, debug, input, output);
 
     private static boolean debugMode = false;
 
-    private static String fileRequestString = "Please provide an XML file path:";
+    private static String fileRequestString = "Please provide an XML file path: ";
+    private static String fileOutputRequestString = "Please provide out csv path: ";
+
+    private static File inputFile = null;
+    private static String outputLocation = null;
 
     public static void main(String[] args) throws IOException {
 
-        File inputFile = null;
-
         // if user has passed in some args, lets see what they are
         if(args.length > 0){
-            for (String arg: args) {
+            for (int i = 0; i < args.length; i++) {
                 // for each arg, check if its an option or file path
-                if(arg.startsWith("-")){
+                if(args[i].startsWith("-")){
                     // if here, then we are dealing with a potential option
-                    if(options.contains(arg)){
-                        callOption(arg);
+                    if(options.contains(args[i])){
+                        callOption(args[i], args[i + 1]);
                     }else{
-                        callOption(help);
+                        callOption(help, "");
                     }
-                }else{
-                    // if here, then we aren't dealing with an option and can see if its a file
-                    inputFile = new File(arg);
                 }
             }
         }
@@ -63,9 +66,29 @@ public class AppMain {
             }
         }
 
+        if(outputLocation == null){
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+            System.out.println(fileOutputRequestString);
+
+            try {
+                outputLocation = reader.readLine();
+            }catch (IOException e){
+                //TODO: think of a better way
+                e.printStackTrace();
+            }
+        }
+
         validateInputFile(inputFile);
+        validateOutputDirectory(outputLocation);
 
         processFile(inputFile);
+    }
+
+    public static void validateOutputDirectory(String output){
+        File file = new File(output);
+
+        Validate.isTrue(file.exists(), "Output directory provided does not exist.");
     }
 
     private static void processFile(File file) {
@@ -89,9 +112,9 @@ public class AppMain {
 
             Validate.notEmpty(transactions, "No transactions found.");
 
-            List<Pair<String, String>> csvOutputs = generateCSVFiles(transactions);
+            List<Pair<String, String>> csvOutputs = generateCSVStrings(transactions);
 
-
+            sendCSVs(csvOutputs, outputLocation);
 
             printInfoMessage("Parsing complete.");
 
@@ -101,7 +124,39 @@ public class AppMain {
 
     }
 
-    private static List<Pair<String, String>> generateCSVFiles(List<Transaction> transactions){
+    private static void sendCSVs(List<Pair<String, String>> csvStringPairs, String outputPath) throws IOException {
+
+        Validate.notEmpty(csvStringPairs, "CSV list is empty.");
+
+        BufferedWriter bw = null;
+
+        for (Pair<String, String> nameCSVPair : csvStringPairs) {
+
+            File outputCSVFile = null;
+            if(outputLocation.endsWith("\\")){
+                outputCSVFile = new File(outputPath + nameCSVPair.getKey() + ".csv");
+            }else{
+                outputCSVFile = new File(outputPath + "\\" + nameCSVPair.getKey() + ".csv");
+            }
+
+            Validate.notNull(outputCSVFile);
+
+            try {
+                bw = new BufferedWriter(new FileWriter(outputCSVFile));
+
+                bw.write(nameCSVPair.getValue());
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }finally {
+                if(bw != null){
+                    bw.close();
+                }
+            }
+        }
+    }
+
+    private static List<Pair<String, String>> generateCSVStrings(List<Transaction> transactions){
 
         // This is an interesting way of doing this, but means I can send back a list of pairs with the
         // name as the key, and string to be sent as a CSV as the value.
@@ -144,7 +199,7 @@ public class AppMain {
                     if(currentBlockName != null){
                         Validate.isTrue(hasHeader, "No header for block.");
 
-                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString() + blockBuilder.toString()));
+                        csvNameAndStringValuePair.add(new Pair<String, String>(currentBlockName, headerRow.toString() + "\\n"+ blockBuilder.toString()));
                     }
 
                     // set the current block name and reset block builder
@@ -302,22 +357,22 @@ public class AppMain {
                 header.setFrom(element.getElementsByTagName("From").item(0).getTextContent());
             }
             if(element.getElementsByTagName("To").getLength() != 0){
-                header.setFrom(element.getElementsByTagName("To").item(0).getTextContent());
+                header.setTo(element.getElementsByTagName("To").item(0).getTextContent());
             }
             if(element.getElementsByTagName("MessageID").getLength() != 0){
-                header.setFrom(element.getElementsByTagName("MessageID").item(0).getTextContent());
+                header.setMessageID(element.getElementsByTagName("MessageID").item(0).getTextContent());
             }
             if(element.getElementsByTagName("MessageDate").getLength() != 0){
-                header.setFrom(element.getElementsByTagName("MessageDate").item(0).getTextContent());
+                header.setMessageDate(element.getElementsByTagName("MessageDate").item(0).getTextContent());
             }
             if(element.getElementsByTagName("TransactionGroup").getLength() != 0){
-                header.setFrom(element.getElementsByTagName("TransactionGroup").item(0).getTextContent());
+                header.setTransactionGroup(element.getElementsByTagName("TransactionGroup").item(0).getTextContent());
             }
             if(element.getElementsByTagName("Priority").getLength() != 0){
-                header.setFrom(element.getElementsByTagName("Priority").item(0).getTextContent());
+                header.setPriority(element.getElementsByTagName("Priority").item(0).getTextContent());
             }
             if(element.getElementsByTagName("Market").getLength() != 0){
-                header.setFrom(element.getElementsByTagName("Market").item(0).getTextContent());
+                header.setMarket(element.getElementsByTagName("Market").item(0).getTextContent());
             }
 
             return header;
@@ -340,7 +395,7 @@ public class AppMain {
         printInfoMessage("File " + file.getName()+ " existence validation completed.");
     }
 
-    private static void callOption(String option) throws IOException {
+    private static void callOption(String option, String path) throws IOException {
 
         //TODO: probably a cleaner way of doing this but this is fast
         if(option.equals(debug)){
@@ -349,7 +404,11 @@ public class AppMain {
         }else if(option.equals(help)){
             // use logger
             printHelp();
-        }else{
+        }else if(option.equals(input)){
+            inputFile = new File(path);
+        }else if(option.equals(output)){
+            outputLocation = path;
+        } else{
             //shouldn't get here
             throw new IOException();
         }
