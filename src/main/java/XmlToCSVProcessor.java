@@ -155,7 +155,7 @@ public class XmlToCSVProcessor {
         return csvNameAndStringValuePair;
     }
 
-    private StringBuilder getHeader(String[] subStrings){
+    private StringBuilder getHeader(String[] subStrings) {
         for (String s : subStrings) {
 
             s.trim();
@@ -164,7 +164,7 @@ public class XmlToCSVProcessor {
             String[] strings = s.split(",");
             String leadingStr = strings[0];
 
-            if(leadingStr.equals("100")){
+            if (leadingStr.equals("100")) {
                 return new StringBuilder().append(s);
             }
         }
@@ -172,7 +172,7 @@ public class XmlToCSVProcessor {
         return null;
     }
 
-    private StringBuilder getTailer(String[] subStrings){
+    private StringBuilder getTailer(String[] subStrings) {
         for (String s : subStrings) {
 
             s.trim();

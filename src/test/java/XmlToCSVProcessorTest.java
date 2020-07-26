@@ -1,5 +1,3 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,58 +5,60 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class XmlToCSVProcessorTest {
 
     XmlToCSVProcessor xmlToCSVProcessor;
 
     @BeforeEach
-    public void init(){
+    public void init() {
         this.xmlToCSVProcessor = new XmlToCSVProcessor();
     }
 
     @Test
-    public void processData_test_with_no_header_data_in_xml(){
+    public void processData_test_with_no_header_data_in_xml() {
         File inputFile = new File("Resources/testfile_without_header.xml");
 
-        try{
+        try {
             this.xmlToCSVProcessor.processFile(inputFile, "");
-        }catch (Exception e){
+        } catch (Exception e) {
             assertEquals("Something went wrong with retreiving the header data from the XML file.",
                     e.getMessage());
         }
     }
 
     @Test
-    public void processData_test_with_no_transaction_in_xml(){
+    public void processData_test_with_no_transaction_in_xml() {
         File inputFile = new File("Resources/testfile_without_transactions.xml");
 
-        try{
+        try {
             this.xmlToCSVProcessor.processFile(inputFile, "");
-        }catch (Exception e){
+        } catch (Exception e) {
             assertEquals("No transactions found.",
                     e.getMessage());
         }
     }
 
     @Test
-    public void processData_test_with_no_transactionID_in_xml(){
+    public void processData_test_with_no_transactionID_in_xml() {
         File inputFile = new File("Resources/testfile_no_transactionID.xml");
 
-        try{
+        try {
             this.xmlToCSVProcessor.processFile(inputFile, "");
-        }catch (Exception e){
+        } catch (Exception e) {
             assertEquals("Transaction must contain a transactionID",
                     e.getMessage());
         }
     }
 
     @Test
-    public void processData_test_with_no_transactionDate_in_xml(){
+    public void processData_test_with_no_transactionDate_in_xml() {
         File inputFile = new File("Resources/testfile_no_transactionDate.xml");
 
-        try{
+        try {
             this.xmlToCSVProcessor.processFile(inputFile, "");
-        }catch (Exception e){
+        } catch (Exception e) {
             assertEquals("Transaction must contain a transactionDate",
                     e.getMessage());
         }
@@ -82,7 +82,7 @@ class XmlToCSVProcessorTest {
         try {
             assertEquals(FileUtils.readLines(expectedCSVOne), FileUtils.readLines(actualCSVOne));
             assertEquals(FileUtils.readLines(expectedCSVTwo), FileUtils.readLines(actualCSVTwo));
-        }finally {
+        } finally {
             actualCSVOne.delete();
             actualCSVTwo.delete();
         }

@@ -1,14 +1,9 @@
-import javafx.util.Pair;
 import org.apache.commons.lang3.Validate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,9 +33,9 @@ public class AppMain {
                 if (args[i].startsWith("-")) {
                     // if here, then we are dealing with a potential option
                     if (options.contains(args[i])) {
-                        if(i + 1 != args.length) {
+                        if (i + 1 != args.length) {
                             callOption(args[i], args[i + 1]);
-                        }else{
+                        } else {
                             callOption(args[i], "");
                         }
                     } else {
@@ -107,7 +102,6 @@ public class AppMain {
 
     private static void callOption(String option, String path) throws IOException {
 
-        //TODO: probably a cleaner way of doing this but this is fast
         if (option.equals(debug)) {
             // get logger
             debugMode = true;
