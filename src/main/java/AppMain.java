@@ -91,11 +91,8 @@ public class AppMain {
 
         printInfoMessage("Validating input file exists.");
 
-        //TODO: validate input file exists and can be read in
         Validate.notNull(file, "File was not provided. Please provide an XML file to be processed.");
         Validate.isTrue(file.exists(), "Could not find file with file path {}", file.getAbsolutePath());
-
-        //TODO: validate file is an XML
 
         printInfoMessage("File " + file.getName() + " existence validation completed.");
     }
@@ -119,7 +116,22 @@ public class AppMain {
     }
 
     private static void printHelp() {
-        //TODO: complete method
+        StringBuilder helpStringBuilder = new StringBuilder();
+        helpStringBuilder.append("Welcome to the ultimate XML to CSV java processing app! (super custom)").append(System.lineSeparator());
+        helpStringBuilder.append(System.lineSeparator());
+        helpStringBuilder.append("This app can be ran in 2 ways. Either all arguements can be passed in when calling through command line.").append(System.lineSeparator());
+        helpStringBuilder.append("Or you can run it and pass in the require input and output directories when asked.").append(System.lineSeparator());
+        helpStringBuilder.append(System.lineSeparator());
+        helpStringBuilder.append("Example - java AppMain -i [xml file path] -o [output directory]").append(System.lineSeparator());
+        helpStringBuilder.append(System.lineSeparator());
+        helpStringBuilder.append("Option you can use are:").append(System.lineSeparator());
+        helpStringBuilder.append(System.lineSeparator());
+        helpStringBuilder.append("-i [xml file path]").append(System.lineSeparator());
+        helpStringBuilder.append("-o [output directory]").append(System.lineSeparator());
+        helpStringBuilder.append("-d - this enables extra debugging info that is printed to the console. Not fully implemented").append(System.lineSeparator());
+        helpStringBuilder.append("-h - for this lovely menu").append(System.lineSeparator());
+
+        System.out.println(helpStringBuilder.toString());
     }
 
     private static void printInfoMessage(String message) {
