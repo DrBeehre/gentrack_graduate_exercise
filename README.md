@@ -1,5 +1,7 @@
 # Gentrack Graduate Exercise
 
+How to run, complie and run the java project and run it with the '-h' option <br />
+This will give you a nice discribtion on how to run the app
 
 Time Allocate:
 1. 30 mins setting up the app, getting maven set up and importing the wanted libraries
